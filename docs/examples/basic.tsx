@@ -1,12 +1,8 @@
-import React, { Component, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Form, { Field } from 'lion-form';
+import Input from './Component/Input';
 
-const Input = props => {
-  const { value, ...restProps } = props;
-  return <input {...restProps} value={value} />;
-};
-
-export default function BasicForm(props) {
+export default function BasicForm() {
   const [form] = Form.useForm();
 
   useEffect(() => {
