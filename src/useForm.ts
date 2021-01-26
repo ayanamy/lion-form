@@ -18,19 +18,23 @@ class FormStore {
     return this.store;
   };
 
-  setFieldsValue = (newStore: any) => {
-    this.store = {
-      ...this.store,
-      ...newStore,
-    };
-    this.fieldEntities.forEach((entity: any) => {
-      const { name } = entity.props;
-      Object.keys(newStore).forEach(key => {
-        if (key === name) {
-          entity.onStoreChange();
-        }
-      });
+  getFieldEntities = () => {
+    return this.fieldEntities;
+  };
+
+  notifyObservers = (prevStore: any) => {
+    this.getFieldEntities().forEach((entity: any) => {
+      const { onStoreChange } = entity;
+      onStoreChange(prevStore, this.getFieldsValue());
     });
+  };
+
+  setFieldsValue = (curStore: any) => {
+    const prevStore = this.store;
+    if (curStore) {
+      this.store = setValues(this.store, curStore);
+    }
+    this.notifyObservers(prevStore);
   };
 
   registerField = (entity: any) => {

@@ -17,8 +17,15 @@ export default class Field extends Component {
     }
   }
 
-  onStoreChange = () => {
-    this.forceUpdate();
+  onStoreChange = (prevStore: any, curStore: any) => {
+    const { shouldUpdate } = this.props as any;
+    if (typeof shouldUpdate === 'function') {
+      if (shouldUpdate(prevStore, curStore)) {
+        this.forceUpdate();
+      }
+    } else {
+      this.forceUpdate();
+    }
   };
 
   getControlled = () => {
