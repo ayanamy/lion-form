@@ -6,6 +6,7 @@ class FormStore {
   private store: any = {};
   private fieldEntities: any = [];
   private initialValues = {};
+  private callbacks = {} as any;
 
   constructor() {}
 
@@ -43,7 +44,8 @@ class FormStore {
   };
 
   submit = () => {
-    console.log(this.getFieldsValue());
+    const { onFinish } = this.callbacks;
+    onFinish(this.getFieldsValue());
   };
 
   private getInitialValue = (namePath: any) =>
@@ -58,6 +60,10 @@ class FormStore {
     }
   };
 
+  setCallbacks = (callbacks: any) => {
+    this.callbacks = callbacks;
+  };
+
   getForm = (): any => ({
     getFieldValue: this.getFieldValue,
     getFieldsValue: this.getFieldsValue,
@@ -67,6 +73,7 @@ class FormStore {
     getInternalHooks: () => {
       return {
         setInitialValues: this.setInitialValues,
+        setCallbacks: this.setCallbacks,
       };
     },
   });

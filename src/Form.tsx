@@ -3,10 +3,10 @@ import useForm from './useForm';
 import FieldContext from './FieldContext';
 
 export default React.forwardRef((props: any, ref) => {
-  const { form, children, initialValues, ...restProps } = props;
+  const { form, children, initialValues, onFinish, ...restProps } = props;
   const [formInstance] = useForm(form) as any;
 
-  const { setInitialValues } = formInstance.getInternalHooks();
+  const { setInitialValues, setCallbacks } = formInstance.getInternalHooks();
 
   React.useImperativeHandle(ref, () => formInstance);
 
@@ -16,6 +16,10 @@ export default React.forwardRef((props: any, ref) => {
   if (!mountRef.current) {
     mountRef.current = true;
   }
+
+  setCallbacks({
+    onFinish,
+  });
 
   return (
     <form
