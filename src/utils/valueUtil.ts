@@ -76,11 +76,14 @@ function internalSetValues<T>(store: T, values: T): T {
   }
 
   Object.keys(values).forEach(key => {
+    // @ts-ignore
     const prevValue = newStore[key];
+    // @ts-ignore
     const value = values[key];
 
     // If both are object (but target is not array), we use recursion to set deep value
     const recursive = isObject(prevValue) && isObject(value);
+    // @ts-ignore
     newStore[key] = recursive
       ? internalSetValues(prevValue, value || {})
       : value;
@@ -135,7 +138,9 @@ export function isSimilar(source: SimilarObject, target: SimilarObject) {
   const keys = new Set([...sourceKeys, ...targetKeys]);
 
   return [...keys].every(key => {
+    // @ts-ignore
     const sourceValue = source[key];
+    // @ts-ignore
     const targetValue = target[key];
 
     if (
@@ -154,6 +159,7 @@ export function defaultGetValueFromEvent(
 ) {
   const event = args[0];
   if (event && event.target && valuePropName in event.target) {
+    // @ts-ignore
     return (event.target as HTMLInputElement)[valuePropName];
   }
 
