@@ -10,7 +10,6 @@ export function allPromiseFinish(
   if (!promiseList.length) {
     return Promise.resolve([]);
   }
-
   return new Promise((resolve, reject) => {
     promiseList.forEach((promise, index) => {
       promise

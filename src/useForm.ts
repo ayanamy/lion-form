@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { setValues } from './utils/valueUtil';
 import { getValue } from './utils/valueUtil';
+import { allPromiseFinish } from './utils/asyncUtil';
 
 class FormStore {
   private store: any = {};
@@ -47,9 +48,64 @@ class FormStore {
     };
   };
 
+  validateFields = () => {
+    const promiseList: any = [];
+    this.getFieldEntities().forEach((field: any) => {
+      const { name, rules } = field.props;
+      if (!rules || !rules.length) {
+        return;
+      }
+      const promise = field.validateRules();
+      promiseList.push(
+        promise
+          .then(() => ({ name: name, errors: [] }))
+          .catch((errors: any) =>
+            Promise.reject({
+              name: name,
+              errors,
+            }),
+          ),
+      );
+    });
+    const summaryPromise = allPromiseFinish(promiseList);
+    const returnPromise = summaryPromise
+      .then(() => {
+        return Promise.resolve(this.getFieldsValue());
+      })
+      .catch(results => {
+        const errorList = results.filter(
+          (result: any) => result && result.errors.length,
+        );
+        return Promise.reject({
+          values: this.getFieldsValue(),
+          errorFields: errorList,
+        });
+      });
+
+    // Do not throw in console
+    returnPromise.catch(e => e);
+
+    return returnPromise;
+  };
+
   submit = () => {
-    const { onFinish } = this.callbacks;
-    onFinish(this.getFieldsValue());
+    this.validateFields()
+      .then(values => {
+        const { onFinish } = this.callbacks;
+        if (onFinish) {
+          try {
+            onFinish(values);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      })
+      .catch(e => {
+        const { onFinishFailed } = this.callbacks;
+        if (onFinishFailed) {
+          onFinishFailed(e);
+        }
+      });
   };
 
   private getInitialValue = (namePath: any) =>
